@@ -1,7 +1,14 @@
 import Vue from 'vue'
 import App from './App.vue'
 
-Vue.config.productionTip = false
+import utils from '@/utils'
+import '@/assets/icon/iconfont.css';
+
+Vue.config.productionTip = false;
+
+if (Vue) {
+  Vue.prototype.hy_utils = utils;
+}
 
 new Vue({
   render: h => h(App),

@@ -1,0 +1,41 @@
+@font-face {font-family: "iconfont";
+  src: url('iconfont.eot?t=1583743620078'); /* IE9 */
+  src: url('iconfont.eot?t=1583743620078#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('data:application/x-font-woff2;charset=utf-8;base64,d09GMgABAAAAAARIAAsAAAAACUQAAAP5AAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHEIGVgCDVgqFDIQqATYCJAMcCxAABCAFhG0HbxsJCBGVnLfIfhbYMW1Y+155tjP74Ts8kmP7Pniecsv3ZyYQkjWpmrDUxFJTqJuexE56pgECCOBa3kpQuidk80pnu9F+mNC0LCUh0kS+72Y3h7AR5qZEGPwt31c+M215IQXuf46lXoLeO8xvF8meVRZJx8crHlh0ADZvIsMJ+R7gWc3nBJ4OARxyUAyp16BZEBuDvJ4AMnhAvx7YARMmo1qwEXwJuxokgoWt5qsHQNj6eflFGbFBYWnkTVv1rd+bWt8e/tyovains4FA3JwD4PcCDRQDDMjURNd4tJMqhsb5PMTQDIjBRmG+Pfxe4Xv9781/boxGCaA2yGSfEKOoaOpfnkHhwwLxQaoYxLY3+FhCsUaFhu8VqBD4Xp8KA9+bU6Hg5wYqfPBzowkL0f6144BE4BbwH7DFHApBpVH4Mo+O0Zmd1JSYxDDXcvrTaxpk+vV49TX0+lu7l18yXnweqHqNW7UjJejs2JNJrd2b381Y6S5MX71erOnrOodWpTnirk5v12vVgj1e6sWXL15UW7Fm7c6F6Y9fv34VjNl0b3Zvw54Ne0+m738t0491cnTmy66Ls2AFXZa4JOLirXTdHk2YFq4OKC9kG1c5f99F+iXh1lzogN95MXOGe/3lgk1AJ2fXpSyFweD+0P5ghr4JwR2hl0WITntrcuUyIH/LCVDmfaGO765M+0TikxU959zfsiFhnCDjEjbc3bIn3hl14kZMKOZGo+zhkWeeePu8J2fCI0fkeJB3fp4LffP31INLdF22pv/8rtnPDK0xzYqUmbm/3v08a/JemKeSf5/O0zHPuzs56xbIs5H/r3Akc9nMEVpgn7e3F0JPpFMhW5g6kXcNLZGZTl/ChcOB8wEjapfNtxYTkTyBf0s4c55IWtn2QNgra1M4zFDkB2nUfgBdVO0E0IfUKwBdTp2wfkMAgTeVTk/qFl/tv+0aAN4tyjsTWqLe0B4Jl15NYfEzIi44ZL5S2ezfu7NWgAA/Iy67kQIOB0Q5X5LbnCa1cCUIW6oHil920Gz5kAZbDCyucuBjqwmOosLermTVnCwAFDEBRIIFSpzLoCXYSIM9YEnzwSehOThCqUO6ClTtnMAoMop/Kjb4XLXqzq5+oYhsxC+1CD9IV0XJahPOpvCQJrZoffHsmhMkOGI4G5gDiYQaVq9ZtU2IkPRC1xTcZKcuAYaCDIn+SGEFXm5MV7vI979AIWKGZLT9cP6A6FSLJ5ZmCiBTlS/Udih3aXqFp07lCIjAIQwrAWMBkeSVamCpq1wh0UqQMg5FVdfuNW4/zwAc8rX8KdFixBKf+MXGuokdFsLmf9b/gK3EMi6omFcjcHTYcWR+WwH8yY+V+o2TCQAAAA==') format('woff2'),
+  url('iconfont.woff?t=1583743620078') format('woff'),
+  url('iconfont.ttf?t=1583743620078') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+ */
+  url('iconfont.svg?t=1583743620078#iconfont') format('svg'); /* iOS 4.1- */
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-pause:before {
+  content: "\e836";
+}
+
+.icon-play:before {
+  content: "\e84d";
+}
+
+.icon-playcircle-fill:before {
+  content: "\e7cd";
+}
+
+.icon-volume:before {
+  content: "\e845";
+}
+
+.icon-FullScreen:before {
+  content: "\ea9d";
+}
+
+.icon-ExitFullScreen:before {
+  content: "\ea9c";
+}
+
