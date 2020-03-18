@@ -26,16 +26,27 @@
       />
     </video>
 
-    <div class="custom-controls" ref="CustomControlsRef" :class="isMousemove ? 'in' : 'out'">
-      <progress class="progress-cell"
-        @click="skipAhead"
-        ref="ProgressRef"
-        :value="currentTime"
-        min="0"
-        :max="duration"
+    <div class="custom-controls" 
+      ref="CustomControlsRef" 
+      :class="isMousemove ? 'in' : 'out'"
+    >
+      <div class="progress-wrapper"
+        @mouseover="mouseActionOnProgress('over')"
+        @mouseleave="mouseActionOnProgress('leave')"      
       >
-        <span id="progress-bar" ref="progressBarRef" :style="`width:${progressBarWidth}`"></span>
-      </progress>
+        <progress class="progress-cell"
+          @click="skipAhead"
+          :class="{'active': bActiveProgress}"
+          ref="ProgressRef"
+          :value="currentTime"
+          min="0"
+          :max="duration"
+        ></progress>
+        <div class="icon" 
+          :style="playProgress" 
+          :class="{'active': bActiveProgress}"
+        ></div>        
+      </div>
       <div class="controls-items">
         <div class="left">
           <span class="play-cell">
@@ -52,10 +63,20 @@
           </span>
         </div>
         <div class="right">
-          <i class="full-screen iconfont"
-            @click="handleFullscreen"
-            :class="isFullScreen ? 'icon-ExitFullScreen' : 'icon-FullScreen'"
-          ></i>
+          <div class="play-rate tool-item">
+            <playback-rate v-model="playRateValue"></playback-rate>
+          </div>
+
+          <div class="volume-control tool-item">
+            <volume v-model="volumeValue"></volume>
+          </div>
+
+          <div class="full-screen tool-item">
+            <i class="full-screen iconfont"
+              @click="handleFullscreen"
+              :class="isFullScreen ? 'icon-ExitFullScreen' : 'icon-FullScreen'"
+            ></i>
+          </div>
         </div>
       </div>
     </div>
@@ -74,9 +95,12 @@
 优化点:
   1. .video-viewer 添加 overflow: hidden
   2. 没有传入 url 时的容错处理
+  3. 删除 progressBarRef[ref], progressBarWidth[computed]
  */
 
 import tool from './tool.js';
+import volume from './volume.vue';
+import playbackRate from './playback-rate.vue';
 export default {
   name: 'VideoViewer',
 
@@ -110,19 +134,23 @@ export default {
       isLoading: true, // 视频是否正在加载,用于显示加载效果
       isFoucsed: false, // 是否聚焦在播放器
       isMousemove: true, // 鼠标是否在播放器上移动
-      duration: 0 // 视频时长
+      duration: 0, // 视频时长
+      volumeValue: 0,
+      playRateValue: 1,
+      bActiveProgress: false
     };
   },
 
   computed: {
-    progressBarWidth () {
+    playProgress () {
       let res = 0;
-      let videoRef = this.$refs.videoRef;
-      if (videoRef) {
-        res = Math.floor((videoRef.currentTime / videoRef.duration) * 100) + '%';
+      if (this.duration) {
+        res = (this.currentTime / this.duration) * 100;
       }
-      return res;
+      res >= 99 ? 99 : ~~res;
+      return `left: ${res}%`;
     }
+
   },
 
   watch: {
@@ -137,6 +165,16 @@ export default {
       },
       deep: true,
       immediate: true
+    },
+    playRateValue (newV) {
+      if (newV) {
+        this.$refs.videoRef.playbackRate = newV;
+      }
+    },
+    volumeValue (newV) {
+      if (newV) {
+        this.$refs.videoRef.volume = newV;
+      }
     }
   },
 
@@ -146,8 +184,14 @@ export default {
   mounted () {
     document.addEventListener('click', this.onFocusMediaViewer);
     document.addEventListener('keydown', this.onKeydown);
+
+    this.$refs.videoRef.volume = this.volumeValue;
   },
 
+  components: {
+    volume,
+    playbackRate
+  },
   methods: {
     onFocusMediaViewer (evt) {
       if (!this.$refs.mediaViewerRef.contains(evt.target)) {
@@ -200,7 +244,7 @@ export default {
         let end = this.$refs.videoRef.played.end(i);
         console.log(`[${start}, ${end}]`);
       }
-
+      console.log(this.$refs.videoRef.playbackRate);
       this.isPlay = !this.isPlay;
 
       if (this.$props.url) {
@@ -226,14 +270,17 @@ export default {
 
     // 点击进度条，前进或者后退
     skipAhead (evt) {
-      if (!this.$props.url) {
+      if (this.$props.url) {
         let ref = this.$refs;
         var pos = evt.offsetX / ref.ProgressRef.offsetWidth;
         this.currentTime = ref.videoRef.currentTime = pos * ref.videoRef.duration;
-  
         this.isPlay = true;
         this.$refs.videoRef.play();
       }
+    },
+
+    mouseActionOnProgress (action) {
+      this.bActiveProgress = action === 'over' ? true : false;
     },
 
     loadstart () {
@@ -243,7 +290,6 @@ export default {
 
     // 在媒体数据已经有足够的数据（至少播放数帧）可供播放时触发。这个事件对应CAN_PLAY的readyState。
     loadeddata () {
-      // console.log('loadeddata');
       this.isLoading = false;
       this.$emit('loadeddata');
 
@@ -253,10 +299,8 @@ export default {
 
           // 在某些情况下无法调用播放器的 play 方法
           instance.then(() => {
-            // console.log('video successes to play');
             this.isPlay = true;
           }).catch(() => {
-            // console.log('video fails to play: ', err);
             this.isPlay = false;
           });
         }
@@ -285,14 +329,12 @@ export default {
     },
 
     ended () {
-      // console.log('ended');
       this.$emit('loaded');
       this.isPlay = false;
 
     },
 
     error () {
-      // console.log('error');
       this.isLoading = false;
       this.$emit('error');
     },
@@ -373,9 +415,14 @@ export default {
     cursor: pointer;
     color: #fff;
   }
-  .progress-cell:hover {
-    height: 8px;
-    top: -2px;
+
+  .progress-wrapper {
+    height: 4px;
+  }
+  
+  .progress-cell.active {
+    height: 6px;
+    top: -1px;
   }
 
   .progress-cell {
@@ -390,6 +437,23 @@ export default {
     z-index: 2;
   }
 
+
+  .progress-wrapper .icon {
+    cursor: pointer;
+    width: 10px;
+    height: 10px;
+    background: #fff;
+    border-radius: 50%;
+    user-select: none;
+    z-index: 2;
+    display: inline-block;
+    position: absolute;
+    top: -3px;
+  } 
+  .progress-wrapper .icon.active {
+    width: 12px;
+    height: 12px;    
+  }
   .controls-items {
     z-index: 1;
     display: flex;
@@ -420,13 +484,22 @@ export default {
     color: #B3B3B3;
   }
   .controls-items .right .iconfont {
-    font-size: 30px;
+    font-size: 28px;
   }
   .controls-items .right {
-    z-index: 1;
-    width: 32px;
+    z-index: 5;
     height: 32px;
     font-size: 24px;
     padding: 22px 30px 22px 30px;
   }    
+  .controls-items .right .tool-item {
+    width: 32px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  
+  .controls-items .right .tool-item + .tool-item{
+    margin-left: 20px;
+  }
+ 
 </style>
