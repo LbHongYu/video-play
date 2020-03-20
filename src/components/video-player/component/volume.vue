@@ -1,7 +1,12 @@
 <template>
   <tool-popup>
     <template v-slot:tool>
-      <i class="iconfont icon-volume"></i>
+      <i class="iconfont"
+        :class="{
+          'icon-jingyin': $props.value === 0, 
+          'icon-volume': $props.value > 0 
+        }"
+      ></i>
     </template>
 
     <template v-slot:popup>
@@ -14,7 +19,9 @@
           @mouseup="mouseupFromIcon"
         >
           <div class="range">
-            <div class="value-track" @click="clickTrack">
+            <div class="value-track" ref="ValueTrackRef" 
+              @click="clickTrack"
+            >
               <div class="track" 
                 :style="trackVolumeHeightStr" 
               ></div>
@@ -30,7 +37,9 @@
     </template>
   </tool-popup>
 </template>
+
 <script>
+import tool from '../tool.js';
 import toolPopup from './tool-popup.vue';
 
 export default {
@@ -44,13 +53,6 @@ export default {
       },
       default: 0
     }
-    // '$props.value': {
-    //   handler () {
-
-    //   },
-    //   deep: true,
-    //   immediate: true
-    // }
   },
 
   computed: {
@@ -62,7 +64,6 @@ export default {
   data () {
     return {
       bCanChangeVolume: false,
-      // volumeValue: '50'
     };
   },
 
@@ -74,7 +75,14 @@ export default {
       this.bCanChangeVolume = true;
     },
     clickTrack (evt) {
-      console.log(evt);
+      if (evt.target === this.$refs.trackIconRef) return;
+
+      let top = tool.getOffsetTop(this.$refs.ValueTrackRef);
+      let volume = evt.clientY - top;
+      if (volume > 100) volume = 100;
+      if (volume < 0) volume = 0;
+
+      this.$emit('input', (100 - volume) / 100);
     },
 
     mouseleaveTrack () {
@@ -104,10 +112,13 @@ export default {
 }
 </script>
 <style scoped>
+  .icon-jingyin {
+    font-size: 24px;
+    color: #fff;  
+  }
   .icon-volume {
     font-size: 28px;
     color: #fff;  
-    user-select: none;  
   }
 
   .volume-range-wrapper {
@@ -140,6 +151,7 @@ export default {
     align-items: center;  
     height: 100%;
     width: 4px;
+    cursor: pointer;
   }
   .value-track .track {
     height: 20%;
@@ -157,7 +169,6 @@ export default {
     height: 10px;
     background: #fff;
     border-radius: 50%;   
-    user-select: none;
   } 
   
 </style>>

@@ -45,6 +45,8 @@
         <div class="icon" 
           :style="playProgress" 
           :class="{'active': bActiveProgress}"
+          v-show="isMousemove"
+          @mousedown="mousedownOnProgressIcon"
         ></div>        
       </div>
       <div class="controls-items">
@@ -82,9 +84,11 @@
     </div>
 
     <!-- 暂停视频时的遮罩 -->
-    <div class="shelter x-y-center" v-show="!isPlay">
+    <div class="shelter x-y-center" 
+      v-show="!isPlay"
+      @click="onSwitchMediaStatus"
+    >
         <i class="iconfont"
-          @click="onSwitchMediaStatus"
           :class="isPlay ? 'ic_video_pause' : 'icon-playcircle-fill'"
         ></i>
     </div>
@@ -99,8 +103,9 @@
  */
 
 import tool from './tool.js';
-import volume from './volume.vue';
-import playbackRate from './playback-rate.vue';
+import volume from './component/volume.vue';
+import playbackRate from './component/playback-rate.vue';
+
 export default {
   name: 'VideoViewer',
 
@@ -135,9 +140,11 @@ export default {
       isFoucsed: false, // 是否聚焦在播放器
       isMousemove: true, // 鼠标是否在播放器上移动
       duration: 0, // 视频时长
-      volumeValue: 0,
-      playRateValue: 1,
-      bActiveProgress: false
+      volumeValue: 0, // 音量
+      playRateValue: 1, // 播放倍速
+      bActiveProgress: false, // 鼠标悬浮在进度条上
+      bPressProgressIcon: false, // 是否按住进度条的定位图标
+      startMovePos: 0 // 按住进度条的定位图标的起始位置
     };
   },
 
@@ -182,8 +189,11 @@ export default {
   created () {},
 
   mounted () {
-    document.addEventListener('click', this.onFocusMediaViewer);
-    document.addEventListener('keydown', this.onKeydown);
+    let doc = document;
+    doc.addEventListener('click', this.onFocusMediaViewer);
+    doc.addEventListener('keydown', this.onKeydown);
+    doc.addEventListener('mousemove', this.mousemoveOnDocument);
+    doc.addEventListener('mouseup', this.mousemupOnDocument);
 
     this.$refs.videoRef.volume = this.volumeValue;
   },
@@ -237,14 +247,44 @@ export default {
       }
     },
 
+    // 
+    mousedownOnProgressIcon (evt) {
+      this.bPressProgressIcon = true;
+      this.iconPos = tool.getOffsetLeft(evt.target);
+    },
+
+    mousemoveOnDocument (evt) {
+      if (this.bPressProgressIcon) {
+        let curPos = getCurIconPostion.call(this, evt) - tool.getOffsetLeft(this.$refs.ProgressRef);
+        
+        let cutTime = ( curPos / this.$refs.ProgressRef.offsetWidth) * this.$refs.videoRef.duration;
+        this.currentTime = this.$refs.videoRef.currentTime =  cutTime;
+      }
+
+      function getCurIconPostion (evt) {
+        let clientX = evt.clientX;
+        let progressleft = tool.getOffsetLeft(this.$refs.ProgressRef);
+        let progressWidth = this.$refs.ProgressRef.offsetWidth;
+
+        //  progressleft |----------clientX---------| progressleft + progressWidth
+        if (clientX < progressleft) {
+          return progressleft;
+        } else if (clientX > progressleft + progressWidth){
+          return progressleft + progressWidth;
+        } else {
+          return clientX;
+        }
+
+      }
+    },
+
+    mousemupOnDocument () {
+      this.bPressProgressIcon = false;
+      this.iconPos = 0;
+    },
+
     // 【暂停/开始】 播放
     onSwitchMediaStatus () {
-      for (let i = 0; i < this.$refs.videoRef.played.length; i++) {
-        let start = this.$refs.videoRef.played.start(i);
-        let end = this.$refs.videoRef.played.end(i);
-        console.log(`[${start}, ${end}]`);
-      }
-      console.log(this.$refs.videoRef.playbackRate);
       this.isPlay = !this.isPlay;
 
       if (this.$props.url) {
@@ -285,7 +325,7 @@ export default {
 
     loadstart () {
       this.isLoading = true;
-      this.$emit('loadeddata');
+      this.$emit('loadstart');
     },
 
     // 在媒体数据已经有足够的数据（至少播放数帧）可供播放时触发。这个事件对应CAN_PLAY的readyState。
@@ -329,9 +369,8 @@ export default {
     },
 
     ended () {
-      this.$emit('loaded');
+      this.$emit('ended');
       this.isPlay = false;
-
     },
 
     error () {
@@ -344,12 +383,12 @@ export default {
     },
 
     showActions () {
-      // if (this.isLoading) return;
-      // this.isMousemove = true;
-      // if (this.showActions.timer) clearTimeout(this.showActions.timer);
-      // this.showActions.timer = setTimeout(() => {
-      //   this.isMousemove = false;
-      // }, 2000);
+      if (this.isLoading) return;
+      this.isMousemove = true;
+      if (this.showActions.timer) clearTimeout(this.showActions.timer);
+      this.showActions.timer = setTimeout(() => {
+        this.isMousemove = false;
+      }, 2000);
     },
 
     handleFullscreen () {
@@ -361,6 +400,25 @@ export default {
         elem.requestFullscreen();
         this.isFullScreen = true;
       }
+    },
+
+    getPlayedDuration (bDetail = false) {
+      let duration = 0;
+      let detail = [];
+      if (!this.$refs.videoRef) {
+        return bDetail ? { duration: duration, detail: [] } : duration;
+      } else {
+        for (let i = 0; i < this.$refs.videoRef.played.length; i++) {
+          let start = this.$refs.videoRef.played.start(i);
+          let end = this.$refs.videoRef.played.end(i);
+  
+          detail.push([start, end]);
+          duration += end - start;
+        }
+
+        return bDetail ? { duration: duration, detail: detail } : duration;
+      }
+
     }
   },
 
@@ -377,6 +435,7 @@ export default {
     position: relative;
     overflow: hidden;
     background: #161823;
+    user-select: none;
   }
   .video-viewer video {
     width: 100%;

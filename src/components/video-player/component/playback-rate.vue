@@ -110,7 +110,6 @@ export default {
     font-size: 18px;
     width: 36px;
     color: #fff;
-    user-select: none;
     cursor: pointer;
 }
 .rate-list {
@@ -118,7 +117,6 @@ export default {
   font-size: 16px;
   /* text-align: left; */
   padding: 10px;
-  user-select: none;
 }
 .rate-list li {
   padding: 6px 2px;

@@ -3,6 +3,7 @@
     <div class="tool" @click="clickTool">
       <slot name="tool"></slot>
     </div>
+    <!-- <div class="popup" ref="PopupRef"> -->
     <div class="popup" ref="PopupRef" v-show="bShowPopup">
       <slot name="popup"></slot>
     </div>

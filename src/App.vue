@@ -1,10 +1,11 @@
 <template>
-  <div id="app" class="x-y-center">
+  <div id="app" class="box x-y-center">
     <div class="video-player-wrapper">
       <video-player
         :url="url"
         :type="'video/mp4'"
-        @loaded="loaded"
+        ref="videoRef"
+        @loadeddata="loadeddata"
         @error="error"
       ></video-player>
     </div>
@@ -19,6 +20,7 @@ export default {
   data () {
     return {
       url: 'https://interactive-examples.mdn.mozilla.net/media/examples/flower.mp4'
+      // url: 'https://ugcws.video.gtimg.com/uwMROfz2r5zBIaQXGdGnC2dfJ6nAzEoO290Tsw9-2jpi_xWl/d0936jsm0z4.p701.1.mp4?sdtfrom=v1107&guid=5cc9aca901218f889ac4976e6b146536&vkey=2F048B3BC94C1141DC5512B04F825F0A592DB22DF095FFB625C875FAF4A28B2BC7B6885CC85A8FD001AD8E977FFD86AA07B18360A690533B4490343342EE0BC3E001B1005F5CE8550BEA7BD19AE8C9FD1CF0B1A9AAD85A4CD95D732AAA2C4D91D588E081A39D52CEF7002D60374301EB8F91E4BA9EFF2FA25BD668225D6B8D13'
     }
   },
 
@@ -27,7 +29,8 @@ export default {
   },
 
   methods: {
-    loaded () {},
+    loadeddata () {     
+    },
     error () {}
   }
 }
@@ -41,6 +44,9 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+.box {
+  flex-direction: column;
 }
 
 /* 

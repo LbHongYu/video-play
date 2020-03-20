@@ -27,6 +27,13 @@
       "unicode_decimal": 59341
     },
     {
+      "icon_id": "8843115",
+      "name": "静音",
+      "font_class": "jingyin",
+      "unicode": "e63e",
+      "unicode_decimal": 58942
+    },
+    {
       "icon_id": "8953343",
       "name": "volume",
       "font_class": "volume",

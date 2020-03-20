@@ -51,9 +51,30 @@ function catchFullScreenError (promise) {
   }
 }
 
+function getOffsetTop (target) {
+  let top = 0;
+  while (target.offsetParent) {
+    top += target.offsetTop;
+    target = target.offsetParent;
+  }
+
+  return top;
+}
+
+function getOffsetLeft (target) {
+  let left = 0;
+  while (target.offsetParent) {
+    left += target.offsetLeft;
+    target = target.offsetParent;
+  }
+
+  return left;
+}
 export default {
   isFullScreenFn,
   requestFullscreen,
   exitFullscreen,
-  catchFullScreenError
+  catchFullScreenError,
+  getOffsetTop,
+  getOffsetLeft
 };
