@@ -298,7 +298,7 @@ export default {
 
     // complete to load the video resource, set media duration
     setVideoDuration () {
-      // console.log('loadedmetadata');
+      console.log('loadedmetadata');
       this.isLoading = false;
 
       let ref = this.$refs.videoRef;
@@ -330,6 +330,7 @@ export default {
 
     // 在媒体数据已经有足够的数据（至少播放数帧）可供播放时触发。这个事件对应CAN_PLAY的readyState。
     loadeddata () {
+      console.log('loadeddata');
       this.isLoading = false;
       this.$emit('loadeddata');
 
@@ -351,6 +352,7 @@ export default {
     playing () {
       // fix: 通过键盘开始播放，隐藏暂停按钮
       this.isPlay = true;
+      console.log(this.$refs.videoRef.played);
       this.$emit('playing');
     },
 
@@ -362,6 +364,11 @@ export default {
 
     // media time update
     mediaTimeupdate () {
+      // let buffered = this.$refs.videoRef.buffered;
+      // let start = buffered.start(0);
+      // let end = buffered.end(0);  
+      // console.log('buffered: ', buffered, 'start: ', start, 'end: ', end);
+          
       if (this.$refs.videoRef) {
         let currentTime = this.$refs.videoRef.currentTime;
         this.currentTime = currentTime;
@@ -394,10 +401,10 @@ export default {
     handleFullscreen () {
       let elem = this.$refs.mediaViewerRef;
       if (tool.isFullScreenFn()) {
-        document.exitFullscreen();
+        tool.exitFullscreen();
         this.isFullScreen = false;
       } else {
-        elem.requestFullscreen();
+        tool.requestFullscreen(elem);
         this.isFullScreen = true;
       }
     },
@@ -408,10 +415,11 @@ export default {
       if (!this.$refs.videoRef) {
         return bDetail ? { duration: duration, detail: [] } : duration;
       } else {
-        for (let i = 0; i < this.$refs.videoRef.played.length; i++) {
-          let start = this.$refs.videoRef.played.start(i);
-          let end = this.$refs.videoRef.played.end(i);
-  
+        let played = this.$refs.videoRef.played;
+        for (let i = 0; i < played.length; i++) {
+          let start = played.start(i);
+          let end = played.end(i);
+
           detail.push([start, end]);
           duration += end - start;
         }
